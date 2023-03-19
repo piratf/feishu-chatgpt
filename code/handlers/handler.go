@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	larkcore "github.com/larksuite/oapi-sdk-go/v3/core"
 	"start-feishubot/initialization"
 	"start-feishubot/services"
 	"start-feishubot/services/openai"
@@ -53,7 +54,7 @@ func (m MessageHandler) msgReceivedHandler(ctx context.Context, event *larkim.P2
 		fmt.Println("unknown chat type")
 		return nil
 	}
-	//fmt.Println(larkcore.Prettify(event.Event.Message))
+	fmt.Println(larkcore.Prettify(event.Event.Message))
 
 	msgType, err := judgeMsgType(event)
 	if err != nil {
