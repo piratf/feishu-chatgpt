@@ -1,6 +1,6 @@
 edition: 1.0.0
 name: feishuBot-chatGpt
-access: "aliyun" #  秘钥别名
+access: "aliyun-chatGPT" #  秘钥别名
 
 vars: # 全局变量
   region: "ap-southeast-1"
@@ -24,6 +24,12 @@ services:
       service:
         name: "feishubot"
         description: "Serverless Devs Website Service"
+        logConfig:
+          project: feishu-chat-gpt
+          logstore: feishu-chat-gpt
+          enableRequestMetrics: true
+          enableInstanceMetrics: true
+          logBeginRule: DefaultRegex
       function:
         name: "feishu-chatgpt"
         description: 'a simple feishubot by serverless devs'
@@ -32,7 +38,7 @@ services:
         customRuntimeConfig:
           command:
             - ./target/main
-        environmentVariables: {}
+        environmentVariables: { }
         handler: index.handler
         instanceConcurrency: 20
         instanceType: e1
