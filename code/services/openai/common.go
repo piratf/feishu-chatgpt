@@ -43,6 +43,7 @@ func (gpt ChatGPT) doAPIRequestWithRetry(url, method string, bodyType requestBod
 		if err != nil {
 			return err
 		}
+		fmt.Println("chat gpt request body: ", string(requestBodyData))
 	case formVoiceDataBody:
 		api = gpt.Lb.GetAPI()
 		formBody := &bytes.Buffer{}

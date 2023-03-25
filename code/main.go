@@ -52,6 +52,7 @@ func main() {
 		sdkginext.NewCardActionHandlerFunc(
 			cardHandler))
 
+	gin.SetMode(gin.ReleaseMode)
 	err := initialization.StartServer(*config, r)
 	if err != nil {
 		log.Fatalf("failed to start server: %v", err)

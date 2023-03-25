@@ -23,6 +23,7 @@ type MsgInfo struct {
 	imageKey    string
 	sessionId   *string
 	mention     []*larkim.MentionEvent
+	role        string // 对应 chat completion 中 msg 的 role，默认为 user
 }
 type ActionInfo struct {
 	handler *MessageHandler
@@ -94,7 +95,7 @@ type RolePlayAction struct { /*角色扮演*/
 
 func (*RolePlayAction) Execute(a *ActionInfo) bool {
 	if system, foundSystem := utils.EitherCutPrefix(a.info.qParsed,
-		"/system ", "角色扮演 "); foundSystem {
+		"/roleplay ", "角色扮演 "); foundSystem {
 		a.handler.sessionCache.Clear(*a.info.sessionId)
 		systemMsg := append([]openai.Messages{}, openai.Messages{
 			Role: "system", Content: system,
@@ -213,7 +214,7 @@ type MessageAction struct { /*消息*/
 func (*MessageAction) Execute(a *ActionInfo) bool {
 	msg := a.handler.sessionCache.GetMsg(*a.info.sessionId)
 	msg = append(msg, openai.Messages{
-		Role: "user", Content: a.info.qParsed,
+		Role: a.info.role, Content: a.info.qParsed,
 	})
 	completions, err := a.handler.gpt.Completions(msg)
 	if err != nil {
@@ -289,4 +290,16 @@ func (*AudioAction) Execute(a *ActionInfo) bool {
 
 	return true
 
+}
+
+type SetRoleAction struct { /*指定 chat msg role*/
+}
+
+func (*SetRoleAction) Execute(a *ActionInfo) bool {
+	if after, foundSystem := utils.EitherCutPrefix(a.info.qParsed,
+		"/system ", "系统设置 "); foundSystem {
+		a.info.role = "system"
+		a.info.qParsed = after
+	}
+	return true
 }

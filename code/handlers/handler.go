@@ -163,7 +163,6 @@ func (m MessageHandler) msgReceivedHandler(ctx context.Context, event *larkim.P2
 		fmt.Println("unknown chat type")
 		return nil
 	}
-	fmt.Println(larkcore.Prettify(event.Event.Message))
 
 	msgType, err := judgeMsgType(event)
 	if err != nil {
@@ -176,8 +175,25 @@ func (m MessageHandler) msgReceivedHandler(ctx context.Context, event *larkim.P2
 	rootId := event.Event.Message.RootId
 	chatId := event.Event.Message.ChatId
 	mention := event.Event.Message.Mentions
+	if chatId != nil {
+		fmt.Println("chatId: ", *chatId)
+	}
+	if rootId != nil {
+		fmt.Println("rootId: ", *rootId)
+	}
+	if msgId != nil {
+		fmt.Println("msgId: ", *msgId)
+	}
+	fmt.Println(larkcore.Prettify(event.Event.Message))
 
-	sessionId := rootId
+	// 默认使用群聊 ID 作为会话上下文，方便使用
+	// 开新话题直接拉新群
+	sessionId := chatId
+	// 取不到群聊 ID 就用消息 ID 代替
+	if sessionId == nil || *sessionId == "" {
+		sessionId = rootId
+	}
+	// 还取不到，就用消息 ID 代替
 	if sessionId == nil || *sessionId == "" {
 		sessionId = msgId
 	}
@@ -191,6 +207,7 @@ func (m MessageHandler) msgReceivedHandler(ctx context.Context, event *larkim.P2
 		imageKey:    parseImageKey(*content),
 		sessionId:   sessionId,
 		mention:     mention,
+		role:        "user",
 	}
 	data := &ActionInfo{
 		ctx:     &ctx,
@@ -206,8 +223,8 @@ func (m MessageHandler) msgReceivedHandler(ctx context.Context, event *larkim.P2
 		&ClearAction{},           //清除消息处理
 		&HelpAction{},            //帮助处理
 		&RolePlayAction{},        //角色扮演处理
+		&SetRoleAction{},         //指定参数 Role 处理
 		&MessageAction{},         //消息处理
-
 	}
 	chain(data, actions...)
 	return nil
