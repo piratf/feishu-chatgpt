@@ -54,7 +54,6 @@ func (m MessageHandler) msgReceivedHandler(ctx context.Context, event *larkim.P2
 		fmt.Println("unknown chat type")
 		return nil
 	}
-	fmt.Println(larkcore.Prettify(event.Event.Message))
 
 	msgType, err := judgeMsgType(event)
 	if err != nil {
@@ -67,8 +66,25 @@ func (m MessageHandler) msgReceivedHandler(ctx context.Context, event *larkim.P2
 	rootId := event.Event.Message.RootId
 	chatId := event.Event.Message.ChatId
 	mention := event.Event.Message.Mentions
+	if chatId != nil {
+		fmt.Println("chatId: ", *chatId)
+	}
+	if rootId != nil {
+		fmt.Println("rootId: ", *rootId)
+	}
+	if msgId != nil {
+		fmt.Println("msgId: ", *msgId)
+	}
+	fmt.Println(larkcore.Prettify(event.Event.Message))
 
-	sessionId := rootId
+	// 默认使用群聊 ID 作为会话上下文，方便使用
+	// 开新话题直接拉新群
+	sessionId := chatId
+	// 取不到群聊 ID 就用消息 ID 代替
+	if sessionId == nil || *sessionId == "" {
+		sessionId = rootId
+	}
+	// 还取不到，就用消息 ID 代替
 	if sessionId == nil || *sessionId == "" {
 		sessionId = msgId
 	}
@@ -89,18 +105,19 @@ func (m MessageHandler) msgReceivedHandler(ctx context.Context, event *larkim.P2
 		info:    &msgInfo,
 	}
 	actions := []Action{
-		&ProcessedUniqueAction{}, //避免重复处理
-		&ProcessMentionAction{},  //判断机器人是否应该被调用
-		&AudioAction{},           //语音处理
-		&EmptyAction{},           //空消息处理
-		&ClearAction{},           //清除消息处理
-		&PicAction{},             //图片处理
-		&AIModeAction{},          //模式切换处理
-		&RoleListAction{},        //角色列表处理
-		&HelpAction{},            //帮助处理
-		&BalanceAction{},         //余额处理
-		&RolePlayAction{},        //角色扮演处理
-		&MessageAction{},         //消息处理
+		&ProcessedUniqueAction{},   //避免重复处理
+		&ProcessMentionAction{},    //判断机器人是否应该被调用
+		&AudioAction{},             //语音处理
+		&EmptyAction{},             //空消息处理
+		&ClearAction{},             //清除消息处理
+		&PicAction{},               //图片处理
+		&AIModeAction{},            //模式切换处理
+		&RoleListAction{},          //角色列表处理
+		&HelpAction{},              //帮助处理
+		&BalanceAction{},           //余额处理
+		&RolePlayAction{},          //角色扮演处理
+		&MessageActionUseEdgeGPT{}, //消息处理
+		//&MessageAction{},           //消息处理
 
 	}
 	chain(data, actions...)

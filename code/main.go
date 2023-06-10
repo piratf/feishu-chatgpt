@@ -27,6 +27,7 @@ func main() {
 	initialization.LoadLarkClient(*config)
 	gpt := openai.NewChatGPT(*config)
 	handlers.InitHandlers(gpt, *config)
+	handlers.InitEdgeGPTServer()
 
 	eventHandler := dispatcher.NewEventDispatcher(
 		config.FeishuAppVerificationToken, config.FeishuAppEncryptKey).
@@ -50,6 +51,7 @@ func main() {
 	r.POST("/webhook/card",
 		sdkginext.NewCardActionHandlerFunc(
 			cardHandler))
+	r.POST("/webhook/edge_gpt", handlers.HandleEdgeGPT)
 
 	if err := initialization.StartServer(*config, r); err != nil {
 		log.Fatalf("failed to start server: %v", err)
