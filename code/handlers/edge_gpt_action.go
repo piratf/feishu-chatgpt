@@ -32,7 +32,7 @@ func asyncResponse(ctx context.Context, key string, ask string, msgId *string) {
 			"🤖️：创建会话失败了，请稍后再试～\n错误信息: %v", err), msgId)
 	}
 	// 异步请求，丢到容器里，然后立即返回
-	mw, err := gpt.AskSync("balanced", ask)
+	mw, err := gpt.AskSync(EdgeGPT.StylePrecise, ask)
 	if err != nil {
 		log.Println("ask sync failed, err: ", err)
 		replyMsg(ctx, fmt.Sprintf(
