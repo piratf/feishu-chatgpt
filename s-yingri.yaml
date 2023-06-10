@@ -22,7 +22,7 @@ services:
     props: # 组件的属性值
       region: ${vars.region} # 关于变量的使用方法，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#变量赋值
       service:
-        name: "feishubot-rabbit"
+        name: "feishubot"
         description: "Serverless Devs Website Service"
         logConfig:
           project: feishu-chat-gpt
@@ -31,7 +31,7 @@ services:
           enableInstanceMetrics: true
           logBeginRule: DefaultRegex
       function:
-        name: "feishu-chatgpt-rabbit"
+        name: "feishu-chatgpt"
         description: 'a simple feishubot by serverless devs'
         codeUri: './code'
         cAPort: 9000
@@ -81,7 +81,7 @@ services:
     props: # 组件的属性值
       region: ${vars.region} # 关于变量的使用方法，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#变量赋值
       service:
-        name: "feishubot-rabbit"
+        name: "feishubot"
         description: "Serverless Devs Website Service"
         logConfig:
           project: feishu-chat-gpt
@@ -90,7 +90,7 @@ services:
           enableInstanceMetrics: true
           logBeginRule: DefaultRegex
       function:
-        name: "edge-gpt-rabbit"
+        name: "edge-gpt"
         description: 'call edge gpt and reply'
         codeUri: './code'
         cAPort: 9000
@@ -99,6 +99,7 @@ services:
             - ./target/main
         environmentVariables:
           GIN_MODE: 'release'
+#          CONVERSATION_ENDPOINT: 'https://edge.churchless.tech/edgesvc/turing/conversation/create'
         handler: index.handler
         instanceConcurrency: 20
         instanceType: e1
